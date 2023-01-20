@@ -184,9 +184,11 @@ class WheelOfFortune {
         this.ctx.font = "bold 30px sans-serif";
         this.ctx.font = "22px serif";
         this.ctx.fillText(sector.label, this.rad - 40, 10);
-        let base_image  = new Image();
-        base_image.src = sector.img
-        this.ctx.drawImage(base_image, 96, -12, 30, 30);
+        // let imageObj = new Image();
+        
+        const img = new Image();
+        img.src = sector.img
+        this.ctx.drawImage(img, 96, -12, 30, 30);
         this.ctx.restore();
     };
 
