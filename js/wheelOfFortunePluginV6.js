@@ -87,7 +87,8 @@ class DragElement {
         this.pos2 = 0;
         this.pos3 = 0;
         this.pos4 = 0;
-
+        this.xPosition = 0;
+        this.yPosition = 0;
         if (isMobileDevice) {
             this.addMobileListener()
             return;
@@ -114,7 +115,9 @@ class DragElement {
             this.elmnt.style.top = (clientY - mobileY) + 'px';
         })
         this.elmnt.addEventListener('touchstart', (e) => {
-            const { clientX, clientY } = e.touches[0]
+            const { clientX, clientY } = e.touches[0];
+            this.xPosition = clientX;
+            this.yPosition = clientY;
             const { left, top } = e.target.getBoundingClientRect();
             mobileX = clientX - left - 10;
             mobileY = clientY - top - 10;
@@ -140,14 +143,14 @@ class DragElement {
         this.pos3 = e.clientX;
         this.pos4 = e.clientY;
 
-        const xPosition = this.elmnt.offsetLeft - this.pos1;
-        const yPosition = this.elmnt.offsetTop - this.pos2;
+        this.xPosition = this.elmnt.offsetLeft - this.pos1;
+        this.yPosition = this.elmnt.offsetTop - this.pos2;
 
-        const isBlocking = this.checkIsMoveBlocking(xPosition, yPosition);
+        const isBlocking = this.checkIsMoveBlocking(this.xPosition, this.yPosition);
         if (isBlocking) return;
 
-        this.elmnt.style.top = yPosition + "px";
-        this.elmnt.style.left = xPosition + "px";
+        this.elmnt.style.top = this.yPosition + "px";
+        this.elmnt.style.left = this.xPosition + "px";
     }
 
     dragMouseDown = (e) => {
@@ -194,7 +197,7 @@ class LocalStorageConfig {
 
 const rand = (m, M) => Math.random() * (M - m) + m;
 
-class WheelOfFortunePluginV5 extends LocalStorageConfig {
+class WheelOfFortunePluginV6 extends LocalStorageConfig {
     constructor() {
         super()
         this.addStyles(cssRules)
@@ -230,7 +233,7 @@ class WheelOfFortunePluginV5 extends LocalStorageConfig {
         this.wheelOfFortune.style.display = 'block';
         this.addCloseIconToElement(this.wheelOfFortune)
 
-        new DragElement(this.wheelOfFortune)
+        this.drageble = new DragElement(this.wheelOfFortune)
 
 
         this.rotate(); // Initial rotation
@@ -334,8 +337,8 @@ class WheelOfFortunePluginV5 extends LocalStorageConfig {
 
         const { clientWidth, clientHeight } = document.documentElement;
 
-        this.posx = parseInt(getRandomArbitrary(0, clientWidth - 250).toFixed());
-        this.posy = parseInt(getRandomArbitrary(0, clientHeight - 250).toFixed());
+        this.posx = parseInt(getRandomArbitrary(10, clientWidth - 250).toFixed());
+        this.posy = parseInt(getRandomArbitrary(10, clientHeight - 250).toFixed());
 
         const initialPosition = {
             x: animationEl.clientWidth + parseInt(this.posy),
@@ -964,8 +967,11 @@ class WheelOfFortunePluginV5 extends LocalStorageConfig {
         const elementHeight = qrEl.offsetHeight;
         const elementWidth = qrEl.offsetWidth;
 
-        qrEl.style.left = `${this.windowWidth <= this.posx + elementWidth ? (this.windowWidth - elementWidth) : this.posx}px`;
-        qrEl.style.top = `${this.windowHeight <= this.posy + elementHeight ? (this.windowHeight - elementHeight) : this.posy}px`;
+        const posX = this.drageble?.xPosition ??  this.posx;
+        const posY = this.drageble?.yPosition ??  this.posy;
+
+        qrEl.style.left = `${this.windowWidth <= posX + elementWidth ? (this.windowWidth - elementWidth) : posX}px`;
+        qrEl.style.top = `${this.windowHeight <= posY + elementHeight ? (this.windowHeight - elementHeight) : posY}px`;
 
         if (isMobileDevice) return;
         qrcodeShow.onclick = () => {
@@ -1031,5 +1037,5 @@ class WheelOfFortunePluginV5 extends LocalStorageConfig {
 }
 
 document.onreadystatechange = () => {
-    new WheelOfFortunePluginV5();
+    new WheelOfFortunePluginV6();
 };
