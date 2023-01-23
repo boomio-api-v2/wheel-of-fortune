@@ -194,7 +194,7 @@ class LocalStorageConfig {
 
 const rand = (m, M) => Math.random() * (M - m) + m;
 
-class WheelOfFortunePlugin extends LocalStorageConfig {
+class WheelOfFortunePluginV2 extends LocalStorageConfig {
     constructor() {
         super()
         this.addStyles(cssRules)
@@ -306,12 +306,15 @@ class WheelOfFortunePlugin extends LocalStorageConfig {
     };
 
     createWheel = () => {
-        document.body.innerHTML = `
-            <div id="wheelOfFortune" style="display: none" class="boomio--animation__wrapper boomio--animation__wrapper--initial">
+        const wheel = document.createElement('div');
+        wheel.setAttribute('id', 'wheelOfFortune');
+        wheel.classList.add('boomio--animation__wrapper', 'boomio--animation__wrapper--initial');
+        wheel.style.display = 'none';
+        wheel.innerHTML = `
                 <canvas id="wheel" width="250" height="250"></canvas>
                 <div id="spin">SPIN asd asd asd as dasd as dasd asd asd as d</div>
-            </div>
-       `
+          `;
+        document.body.appendChild(wheel)
     }
 
     startAnimation = () => {
@@ -1017,5 +1020,5 @@ class WheelOfFortunePlugin extends LocalStorageConfig {
 }
 
 document.onreadystatechange = () => {
-    new WheelOfFortunePlugin();
+    new WheelOfFortunePluginV2();
 };
