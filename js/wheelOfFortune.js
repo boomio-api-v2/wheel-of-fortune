@@ -5,12 +5,31 @@ const localStoragePropertyName = 'boomioPluginWheelOfFortuneConfig';
 const cssRules = `
 #wheelOfFortune {
     display: inline-flex;
-    position: relative;
-    overflow: hidden;
+    position: fixed;
+    overflow: initial;
+    z-index: 1000;
 }
 
 #wheel {
     display: block;
+}
+
+.custom-close-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 0px;
+    font-size: 13px;
+    top: 0px;
+    color: #000;
+    cursor: pointer;
+    background-color: lightgray;
+    width: 16px;
+    height: 16px;
+    border-radius: 20px;
+    font-size: 10px;
+    opacity: 0.45;
 }
 
 #spin {
@@ -46,6 +65,92 @@ const cssRules = `
 const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 //////////////////
+
+/////// Drag Element /////////
+
+class DragElement {
+    constructor(elmnt) {
+        this.elmnt = elmnt;
+        this.pos1 = 0;
+        this.pos2 = 0;
+        this.pos3 = 0;
+        this.pos4 = 0;
+
+        if (isMobileDevice) {
+            this.addMobileListener()
+            return;
+        }
+
+        if (document.getElementById(elmnt.id + "header")) {
+            // if present, the header is where you move the DIV from:
+            document.getElementById(elmnt.id + "header").onmousedown = this.dragMouseDown;
+        } else {
+            // otherwise, move the DIV from anywhere inside the DIV:
+            elmnt.onmousedown = this.dragMouseDown;
+
+        }
+    }
+    addMobileListener() {
+        let mobileX = 0;
+        let mobileY = 0;
+        this.elmnt.addEventListener('touchmove', (e) =>  {
+            e.preventDefault()
+            const { clientX, clientY } = e.touches[0];
+            const isBlocking = this.checkIsMoveBlocking(clientX, clientY);
+            if (isBlocking) return;
+            this.elmnt.style.left = (clientX - mobileX) + 'px';
+            this.elmnt.style.top = (clientY - mobileY) + 'px';
+        })
+        this.elmnt.addEventListener('touchstart', (e) => {
+            const { clientX, clientY } = e.touches[0]
+            const { left, top } = e.target.getBoundingClientRect();
+            mobileX = clientX - left - 10;
+            mobileY = clientY - top - 10;
+        })
+
+    }
+
+    closeDragElement = () => {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+
+    checkIsMoveBlocking(x, y) {
+        if (x <= 0 || y <= 0) return true;
+        return false;
+    }
+
+    elementDrag = (e) => {
+        e = e || window.event;
+        e.preventDefault();
+        this.pos1 = this.pos3 - e.clientX;
+        this.pos2 = this.pos4 - e.clientY;
+        this.pos3 = e.clientX;
+        this.pos4 = e.clientY;
+
+        const xPosition = this.elmnt.offsetLeft - this.pos1;
+        const yPosition = this.elmnt.offsetTop - this.pos2;
+
+        const isBlocking = this.checkIsMoveBlocking(xPosition, yPosition);
+        if (isBlocking) return;
+
+        this.elmnt.style.top = yPosition + "px";
+        this.elmnt.style.left = xPosition + "px";
+    }
+
+    dragMouseDown = (e) => {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        this.pos3 = e.clientX;
+        this.pos4 = e.clientY;
+        document.onmouseup = this.closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = this.elementDrag;
+    }
+}
+
+///////////
 
 const getRandomArbitrary = (min, max) => Math.random() * (max - min) + min;
 
@@ -102,7 +207,12 @@ class WheelOfFortune extends LocalStorageConfig {
 
         this.config.list.forEach(this.drawSector);
         if (document.readyState !== 'complete') return;
-        document.getElementById('wheelOfFortune').style.display = 'block';
+        const wheelOfFortune = document.getElementById('wheelOfFortune');
+        wheelOfFortune.style.display = 'block';
+        this.addCloseIconToElement(wheelOfFortune)
+
+        new DragElement(wheelOfFortune)
+
 
         this.rotate(); // Initial rotation
         this.engine(); // Start engine!
@@ -169,11 +279,11 @@ class WheelOfFortune extends LocalStorageConfig {
         this.ctx.textAlign = "right";
         this.ctx.fillStyle = "#fff";
         this.ctx.font = "bold 30px sans-serif";
-        this.ctx.font = "22px serif";
+        this.ctx.font = "14px serif";
         const img = new Image();
         img.src = sector.img
-        this.ctx.drawImage(img, 96, -12, 22, 22);
-        this.ctx.fillText(sector.label, this.rad - 40, 10);
+        this.ctx.drawImage(img, 86, -12, 32, 32);
+        this.ctx.fillText(sector.label, this.rad - 55, 10);
         this.ctx.restore();
     };
 
@@ -471,6 +581,18 @@ class WheelOfFortune extends LocalStorageConfig {
             style.appendChild(document.createTextNode(cssRules));
         }
     };
+
+    addCloseIconToElement = (element) => {
+        const closeBtn = document.createElement('div')
+        closeBtn.classList.add('custom-close-icon')
+        closeBtn.innerHTML = '&#x2715; ';
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            element.remove()
+        },{ once: true })
+        element.appendChild(closeBtn)
+    }
 
 }
 

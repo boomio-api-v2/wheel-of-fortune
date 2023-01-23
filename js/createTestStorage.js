@@ -1,5 +1,5 @@
 const defaultConfig = {
-    animation: 3,
+    animation: 5,
     list: [
         {
             color:"#f82",
@@ -24,7 +24,7 @@ const defaultConfig = {
         {
             color:"#b0f",
             label:"100",
-            img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ63OPOyiad8Mj5CapHI7gMhkSwlRIs7EB-g&usqp=CAU",
+            img: 'https://cdn.freebiesupply.com/images/large/2x/dallas-cowboys-logo-transparent.png'
         },
         {
             color:"#f0b",
