@@ -194,7 +194,7 @@ class LocalStorageConfig {
 
 const rand = (m, M) => Math.random() * (M - m) + m;
 
-class WheelOfFortunePluginV4 extends LocalStorageConfig {
+class WheelOfFortunePluginV5 extends LocalStorageConfig {
     constructor() {
         super()
         this.addStyles(cssRules)
@@ -964,13 +964,8 @@ class WheelOfFortunePluginV4 extends LocalStorageConfig {
         const elementHeight = qrEl.offsetHeight;
         const elementWidth = qrEl.offsetWidth;
 
-        if (isMobileDevice) {
-            qrEl.style.left = '0px';
-            qrEl.style.top = '0px';
-        } else {
-            qrEl.style.left = `${this.windowWidth <= this.posx + elementWidth ? (this.windowWidth - elementWidth) : this.posx}px`;
-            qrEl.style.top = `${this.windowHeight <= this.posy + elementHeight ? (this.windowHeight - elementHeight) : this.posy}px`;
-        }
+        qrEl.style.left = `${this.windowWidth <= this.posx + elementWidth ? (this.windowWidth - elementWidth) : this.posx}px`;
+        qrEl.style.top = `${this.windowHeight <= this.posy + elementHeight ? (this.windowHeight - elementHeight) : this.posy}px`;
 
         if (isMobileDevice) return;
         qrcodeShow.onclick = () => {
@@ -1036,5 +1031,5 @@ class WheelOfFortunePluginV4 extends LocalStorageConfig {
 }
 
 document.onreadystatechange = () => {
-    new WheelOfFortunePluginV4();
+    new WheelOfFortunePluginV5();
 };
