@@ -194,7 +194,7 @@ class LocalStorageConfig {
 
 const rand = (m, M) => Math.random() * (M - m) + m;
 
-class WheelOfFortunePluginV3 extends LocalStorageConfig {
+class WheelOfFortunePluginV4 extends LocalStorageConfig {
     constructor() {
         super()
         this.addStyles(cssRules)
@@ -215,6 +215,8 @@ class WheelOfFortunePluginV3 extends LocalStorageConfig {
         this.ang = 0;
         this.isSpinning = false;
         this.isAccelerating = false;
+        this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        this.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
         this.elSpin.addEventListener("click", () => {
             if (this.isSpinning) return;
             this.isSpinning = true;
@@ -228,7 +230,7 @@ class WheelOfFortunePluginV3 extends LocalStorageConfig {
         this.wheelOfFortune.style.display = 'block';
         this.addCloseIconToElement(this.wheelOfFortune)
 
-        new DragElement(wheelOfFortune)
+        new DragElement(this.wheelOfFortune)
 
 
         this.rotate(); // Initial rotation
@@ -332,8 +334,8 @@ class WheelOfFortunePluginV3 extends LocalStorageConfig {
 
         const { clientWidth, clientHeight } = document.documentElement;
 
-        this.posx = getRandomArbitrary(0, clientWidth - 250).toFixed();
-        this.posy = getRandomArbitrary(0, clientHeight - 250).toFixed();
+        this.posx = parseInt(getRandomArbitrary(0, clientWidth - 250).toFixed());
+        this.posy = parseInt(getRandomArbitrary(0, clientHeight - 250).toFixed());
 
         const initialPosition = {
             x: animationEl.clientWidth + parseInt(this.posy),
@@ -936,8 +938,7 @@ class WheelOfFortunePluginV3 extends LocalStorageConfig {
         const qrEl = document.createElement('div');
 
         qrEl.setAttribute('id', 'boomio--qr');
-        qrEl.style.left = `${this.posx}px`;
-        qrEl.style.top = `${this.posy}px`;
+
 
         qrEl.innerHTML = this.qrCodeInnerHtml();
 
@@ -959,6 +960,18 @@ class WheelOfFortunePluginV3 extends LocalStorageConfig {
             elementRemove.remove();
             e.stopPropagation();
         };
+
+        const elementHeight = qrEl.offsetHeight;
+        const elementWidth = qrEl.offsetWidth;
+
+        if (isMobileDevice) {
+            qrEl.style.left = '0px';
+            qrEl.style.top = '0px';
+        } else {
+            qrEl.style.left = `${this.windowWidth <= this.posx + elementWidth ? (this.windowWidth - elementWidth) : this.posx}px`;
+            qrEl.style.top = `${this.windowHeight <= this.posy + elementHeight ? (this.windowHeight - elementHeight) : this.posy}px`;
+        }
+
         if (isMobileDevice) return;
         qrcodeShow.onclick = () => {
             coupon.style.display = 'block'
@@ -1023,5 +1036,5 @@ class WheelOfFortunePluginV3 extends LocalStorageConfig {
 }
 
 document.onreadystatechange = () => {
-    new WheelOfFortunePluginV3();
+    new WheelOfFortunePluginV4();
 };
