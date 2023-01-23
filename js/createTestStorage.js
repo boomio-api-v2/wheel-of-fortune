@@ -1,5 +1,6 @@
 const defaultConfig = {
     animation: 5,
+    qrCode: '3877216F19FE4DD59E0C08C3BA569A0F',
     list: [
         {
             color:"#f82",
